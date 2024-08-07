@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elec_e_comm/admin/home_admin.dart';
+import 'package:elec_e_comm/view/login.dart';
 import 'package:elec_e_comm/view/widgets/support_widget.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -140,6 +141,29 @@ class _AdminLoginState extends State<AdminLogin> {
                     )),
                   ),
                 ),
+                SizedBox(
+                  height: 15,
+                ),
+                Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Login(),
+                            ));
+                      },
+                      child: Text(
+                        "LogIn as User",
+                        style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),

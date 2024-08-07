@@ -6,6 +6,7 @@ import 'package:elec_e_comm/view/widgets/support_widget.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
 
@@ -22,6 +23,8 @@ class _AddProdutState extends State<AddProdut> {
   TextEditingController _namecontroller = TextEditingController();
   TextEditingController _pricecontroller = TextEditingController();
   TextEditingController _detailcontroller = TextEditingController();
+  String? value;
+  final List<String> categoryitem = ['watch', 'laptop', 'Tv', 'Headphones'];
 
   Future getImage() async {
     var image = await _picker.pickImage(source: ImageSource.gallery);
@@ -31,35 +34,74 @@ class _AddProdutState extends State<AddProdut> {
 
   uploadItem() async {
     if (selectedimage != null && _namecontroller.text != "") {
-      String RandomId = randomAlphaNumeric(10);
-      Reference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child("blogImage").child(RandomId);
+      try {
+        String RandomId = randomAlphaNumeric(10);
+        Reference firebaseStorageRef =
+            FirebaseStorage.instance.ref().child("blogImage").child(RandomId);
 
-      final UploadTask task = firebaseStorageRef.putFile(selectedimage!);
-      var downloadURl = await (await task).ref.getDownloadURL();
-      Map<String, dynamic> addProduct = {
-        "Name": _namecontroller.text,
-        "Image": downloadURl,
-        "Price": _pricecontroller.text,
-        "Details": _detailcontroller.text
-      };
-      await DatabaseMethods().addProduct(addProduct, value!).then(() {
-        selectedimage = null;
-        _namecontroller.text = "";
+        final UploadTask task = firebaseStorageRef.putFile(selectedimage!);
+        var downloadURl = await (await task).ref.getDownloadURL();
+        String firstletter = _namecontroller.text.substring(0, 1).toUpperCase();
 
+        Map<String, dynamic> addProduct = {
+          "Name": _namecontroller.text,
+          "Image": downloadURl,
+          "SearchKey": firstletter,
+          "UpdatedName": _namecontroller.text.toUpperCase(),
+          "Price": _pricecontroller.text,
+          "Details": _detailcontroller.text
+        };
+
+        await DatabaseMethods().addProduct(addProduct, value!).then((_) async {
+          await DatabaseMethods().addAllProducts(addProduct).then((value) {
+            setState(() {
+              selectedimage = null;
+              _namecontroller.text = "";
+              _pricecontroller.text = "";
+              _detailcontroller.text = "";
+              this.value = null;
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.redAccent,
+              content: const Text(
+                "Product has been Uploaded Sucessfully",
+                style: TextStyle(fontSize: 20.0),
+              ),
+            ));
+          }).catchError((error) {
+            print("Error adding product to all products: $error");
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.redAccent,
+              content: Text(
+                "Failed to add product to all products: $error",
+                style: TextStyle(fontSize: 20.0),
+              ),
+            ));
+          });
+        }).catchError((error) {
+          print("Error adding product: $error");
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              "Failed to add product: $error",
+              style: TextStyle(fontSize: 20.0),
+            ),
+          ));
+        });
+      } catch (e) {
+        print("Error uploading item: $e");
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.redAccent,
-          content: const Text(
-            "Product has been Uploaded Sucessfully",
+          content: Text(
+            "Error uploading item: $e",
             style: TextStyle(fontSize: 20.0),
           ),
         ));
-      });
+      }
     }
   }
 
-  String? value;
-  final List<String> categoryitem = ['watch', 'laptop', 'Tv', 'Headphones'];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,16 +146,21 @@ class _AddProdutState extends State<AddProdut> {
                               borderRadius: BorderRadius.circular(20)),
                         ),
                       )
-                    : Container(
-                        height: 150,
-                        width: 150,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20)),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.file(
-                            selectedimage!,
-                            fit: BoxFit.cover,
+                    : GestureDetector(
+                        onTap: () {
+                          getImage();
+                        },
+                        child: Container(
+                          height: 150,
+                          width: 150,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20)),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.file(
+                              selectedimage!,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
@@ -230,6 +277,7 @@ class _AddProdutState extends State<AddProdut> {
                   child: ElevatedButton(
                       onPressed: () {
                         uploadItem();
+                        setState(() {});
                       },
                       child: Text(
                         "Add Product",

@@ -244,6 +244,7 @@
 // }
 
 import 'package:elec_e_comm/services/database.dart';
+import 'package:elec_e_comm/services/shared_prefs.dart';
 import 'package:elec_e_comm/view/login.dart';
 import 'package:elec_e_comm/view/widgets/bottom_nav.dart';
 import 'package:elec_e_comm/view/widgets/support_widget.dart';
@@ -295,6 +296,11 @@ class _SignUpState extends State<SignUp> {
               "https://images.smiletemplates.com/uploads/screenshots/179/0000179308/powerpoint-template-450w.jpg"
         };
         await DatabaseMethods().addUserDetails(userinfo, Id);
+        await SharedPreferencesHelper().saveUserName(namecontroller.text);
+        await SharedPreferencesHelper().saveUserId(Id);
+        await SharedPreferencesHelper().saveUserEmail(emailcontroller.text);
+        await SharedPreferencesHelper().saveUserImage(
+            "https://images.smiletemplates.com/uploads/screenshots/179/0000179308/powerpoint-template-450w.jpg");
 
         Navigator.push(
             context,

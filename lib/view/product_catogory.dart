@@ -55,7 +55,7 @@ class _ProductCatogoryState extends State<ProductCatogory> {
                           ),
                           Text(
                             ds["Name"],
-                            style: AppWidget.SemiBoldTextStyle(),
+                            style: AppWidget.lightBoldTextStyle(),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,

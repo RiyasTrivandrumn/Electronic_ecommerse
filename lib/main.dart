@@ -1,14 +1,15 @@
-import 'package:elec_e_comm/admin/add_products.dart';
 import 'package:elec_e_comm/firebase_options.dart';
+import 'package:elec_e_comm/services/constant.dart';
 import 'package:elec_e_comm/view/bording.dart';
-import 'package:elec_e_comm/view/home.dart';
-import 'package:elec_e_comm/view/signup.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  Stripe.publishableKey = publishablekey;
 
   runApp(const MyApp());
 }
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: HomePage(),
+      home: Onboarding(),
     );
   }
 }
