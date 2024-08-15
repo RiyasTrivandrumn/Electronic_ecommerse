@@ -1,13 +1,16 @@
 import 'dart:io';
 
 import 'package:elec_e_comm/services/auth.dart';
+import 'package:elec_e_comm/services/database.dart';
 import 'package:elec_e_comm/services/shared_prefs.dart';
 import 'package:elec_e_comm/view/bording.dart';
 import 'package:elec_e_comm/view/login.dart';
 import 'package:elec_e_comm/view/widgets/support_widget.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:random_string/random_string.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -19,14 +22,50 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   final ImagePicker _picker = ImagePicker();
   File? selectedimage;
-  String? image, name, email;
+
+  String? image, name, email, docId;
 
   getthesharedpref() async {
     image = await SharedPreferencesHelper().getUserImage();
-    name = await SharedPreferencesHelper().getUserName();
+
     email = await SharedPreferencesHelper().getUserEmail();
+    print(email);
 
     setState(() {});
+  }
+
+  void uploadImage() async {
+    if (selectedimage != null) {
+      try {
+        String RandomId = randomAlphaNumeric(10);
+        Reference firebaseStorageRef =
+            FirebaseStorage.instance.ref().child("blogImage").child(RandomId);
+
+        final UploadTask task = firebaseStorageRef.putFile(selectedimage!);
+        var downloadURl = await (await task).ref.getDownloadURL();
+
+        DatabaseMethods().updateImage(DocId: docId!, image: downloadURl);
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("No image selected")));
+    }
+  }
+
+  Future<void> _init() async {
+    await getthesharedpref();
+    if (email != null) {
+      var data = await DatabaseMethods().getUserByEmail(email);
+
+      setState(() {
+        name = data["name"];
+        image = data["Image"];
+        docId = data["id"];
+      });
+      print(name);
+    }
   }
 
   Future getImage() async {
@@ -45,7 +84,7 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     // TODO: implement initState
-    getthesharedpref();
+    _init();
   }
 
   @override
@@ -59,7 +98,7 @@ class _ProfileState extends State<Profile> {
         ),
       ),
       backgroundColor: Color.fromARGB(255, 239, 235, 235),
-      body: email == null
+      body: name == null
           ? Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.only(top: 17),
@@ -72,21 +111,14 @@ class _ProfileState extends State<Profile> {
                                 onTap: () {
                                   getImage();
                                 },
-                                child: image == null
-                                    ? ClipOval(
-                                        child: Image.asset("images/profie.png",
-                                            height: 160.0,
-                                            width: 160.0,
-                                            fit: BoxFit.cover),
-                                      )
-                                    : ClipOval(
-                                        child: Image.network(
-                                          image!,
-                                          height: 160.0,
-                                          width: 160.0,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
+                                child: ClipOval(
+                                  child: Image.network(
+                                    image!,
+                                    height: 160.0,
+                                    width: 160.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               )
                             : ClipOval(
                                 child: Image.file(
@@ -96,6 +128,16 @@ class _ProfileState extends State<Profile> {
                                   fit: BoxFit.cover,
                                 ),
                               )),
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromARGB(255, 105, 185, 250),
+                            foregroundColor: Colors.black),
+                        onPressed: () {
+                          setState(() {
+                            uploadImage();
+                          });
+                        },
+                        child: Text("Save Image")),
                     Padding(
                       padding: const EdgeInsets.all(18.0),
                       child: Material(
@@ -125,7 +167,7 @@ class _ProfileState extends State<Profile> {
                                       style: AppWidget.lightTextStyle(),
                                     ),
                                     Text(
-                                      "Riyas.F",
+                                      name ?? "None",
                                       style: AppWidget.SemiBoldTextStyle(),
                                     )
                                   ],
@@ -184,7 +226,7 @@ class _ProfileState extends State<Profile> {
                         child: GestureDetector(
                           onTap: () {
                             AuthMethods().SignOut().then((_) {
-                              Future.delayed(Duration(seconds: 3), () {
+                              Future.delayed(Duration(seconds: 2), () {
                                 Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(

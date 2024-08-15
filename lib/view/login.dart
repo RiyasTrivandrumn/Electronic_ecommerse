@@ -29,7 +29,8 @@ class _LoginState extends State<Login> {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email!, password: password!);
 
-      await SharedPreferencesHelper().saveUserEmail(emailcontroller.text);
+      await SharedPreferencesHelper()
+          .saveUserEmail(emailcontroller.text.trim());
 
       Navigator.pushReplacement(
           context,

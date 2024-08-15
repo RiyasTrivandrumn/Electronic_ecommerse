@@ -293,14 +293,12 @@ class _SignUpState extends State<SignUp> {
           "email": emailcontroller.text,
           "id": Id,
           "Image":
-              "https://images.smiletemplates.com/uploads/screenshots/179/0000179308/powerpoint-template-450w.jpg"
+              "https://img.freepik.com/free-photo/3d-illustration-business-man-with-glasses-grey-background-clipping-path_1142-58140.jpg?t=st=1723562206~exp=1723565806~hmac=2b026ef9063d3aa3f98b216fe8889cc632d6f4f6ee78ed6e792cd04935df40a4&w=740"
         };
         await DatabaseMethods().addUserDetails(userinfo, Id);
         await SharedPreferencesHelper().saveUserName(namecontroller.text);
         await SharedPreferencesHelper().saveUserId(Id);
         await SharedPreferencesHelper().saveUserEmail(emailcontroller.text);
-        await SharedPreferencesHelper().saveUserImage(
-            "https://images.smiletemplates.com/uploads/screenshots/179/0000179308/powerpoint-template-450w.jpg");
 
         Navigator.push(
             context,

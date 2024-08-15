@@ -72,4 +72,24 @@ class DatabaseMethods {
       rethrow; // Optionally rethrow the error after logging it
     }
   }
+
+  Future<Map<String, dynamic>> getUserByEmail(String? email) async {
+    // Reference to the users collection
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+
+    // Query to get the document with the specific email
+    QuerySnapshot querySnapshot =
+        await users.where('email', isEqualTo: email).get();
+
+    var data = querySnapshot.docs.first.data() as Map<String, dynamic>;
+
+    return data;
+  }
+
+  updateImage({required String DocId, required String image}) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(DocId)
+        .update({"Image": image});
+  }
 }

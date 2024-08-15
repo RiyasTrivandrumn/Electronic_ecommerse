@@ -45,7 +45,7 @@ class _OrderState extends State<Order> {
                           children: [
                             Image.network(
                               ds["ProductImage"],
-                              width: 200,
+                              width: 170,
                             ),
                             Padding(
                               padding: const EdgeInsets.only(right: 12),

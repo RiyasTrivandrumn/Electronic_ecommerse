@@ -1,6 +1,7 @@
 import 'package:elec_e_comm/firebase_options.dart';
 import 'package:elec_e_comm/services/constant.dart';
 import 'package:elec_e_comm/view/bording.dart';
+import 'package:elec_e_comm/view/splash_screen.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Onboarding(),
+      home: Splash_Screen(),
     );
   }
 }
