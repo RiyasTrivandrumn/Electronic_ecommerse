@@ -24,11 +24,15 @@ class ProductDetails extends StatefulWidget {
 class _ProductDetailsState extends State<ProductDetails> {
   String? name, mail, image;
 
-  getthesharedprefs() async {
-    name = await SharedPreferencesHelper().getUserName();
-    mail = await SharedPreferencesHelper().getUserEmail();
-    image = await SharedPreferencesHelper().getUserImage();
-    setState(() {});
+  getuserDetails() async {
+    String? UserEmail = await SharedPreferencesHelper().getUserEmail();
+    var data = await DatabaseMethods().getUserByEmail(UserEmail);
+
+    setState(() {
+      name = data['name'];
+      mail = UserEmail;
+      image = data['Image'];
+    });
   }
 
   Map<String, dynamic>? paymentIntent;
@@ -36,7 +40,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   @override
   void initState() {
     // TODO: implement initState
-    getthesharedprefs();
+    getuserDetails();
   }
 
   @override

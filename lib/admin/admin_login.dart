@@ -34,7 +34,7 @@ class _AdminLoginState extends State<AdminLogin> {
             style: TextStyle(fontSize: 20),
           )));
         } else {
-          Navigator.push(
+          Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => HomeAdmin(),

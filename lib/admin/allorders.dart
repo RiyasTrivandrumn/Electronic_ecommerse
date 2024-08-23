@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elec_e_comm/services/database.dart';
+import 'package:elec_e_comm/services/shared_prefs.dart';
 import 'package:elec_e_comm/view/widgets/support_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -12,10 +13,15 @@ class AllOrders extends StatefulWidget {
 
 class _AllOrdersState extends State<AllOrders> {
   Stream? allStream;
+  bool isloading = true;
 
   loadProducts() async {
     allStream = await DatabaseMethods().allOrders();
-    setState(() {});
+    setState(() {
+      if (allStream != null) {
+        isloading = false;
+      }
+    });
   }
 
   Widget allOrders({required double height}) {
@@ -136,7 +142,11 @@ class _AllOrdersState extends State<AllOrders> {
         ),
       ),
       body: Container(
-        child: allOrders(height: height),
+        child: isloading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : allOrders(height: height),
       ),
     );
   }
